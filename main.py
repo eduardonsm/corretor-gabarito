@@ -1,7 +1,6 @@
 import cv2
-import extrairGabarito as exG
+from funcoes import gerar_pdf, upar_imagem,extrairMaiorCtn,selecionar
 from tkinter import Tk, Button, filedialog, messagebox,Label
-from reportlab.pdfgen import canvas
 
 campos = [(12, 2, 92, 85), (105, 2, 92, 85), (196, 2, 92, 85), (289, 2, 92, 85),
           (12, 95, 92, 85), (105, 95, 92, 85), (196, 95, 92, 85), (289, 95, 92, 85),
@@ -67,15 +66,12 @@ def upload_e_processar():
     if filename:
         processar_imagem(filename)
 
-def upar_imagem():
-    filename = filedialog.askopenfilename()
-    return filename
 
 def processar_imagem(imagem):
     imagem_bruto = cv2.imread(imagem)
     imagem = cv2.resize(imagem_bruto, (600, 700))
 
-    gabarito = exG.extrairMaiorCtn(imagem)
+    gabarito = extrairMaiorCtn(imagem)
     imgGray = cv2.cvtColor(gabarito, cv2.COLOR_BGR2GRAY)
     ret, imgTh = cv2.threshold(imgGray, 100, 255, cv2.THRESH_BINARY_INV)
 
@@ -85,13 +81,6 @@ def processar_imagem(imagem):
 def selecionar_manualmente():
     imagem = upar_imagem()
     imagem_bruto = cv2.imread(imagem)
-
-    def selecionar(img):
-        img = cv2.resize(img, (600, 700))
-        x, y, w, h = cv2.selectROI(img)
-        recorte = img[y:y+h, x:x+w]
-        recorte = cv2.resize(recorte, (400, 500))
-        return recorte
 
     gabarito = selecionar(imagem_bruto)
 
@@ -130,35 +119,8 @@ button_selecionar_manualmente = Button(root, text="Selecionar Manualmente", comm
 
 button_selecionar_manualmente.place(relx=0.5, rely=0.8, anchor="center")
 
-def gerar_pdf():
-
-    c = canvas.Canvas("relatorio.pdf")
-    x=100
-    y= (len(respostas_armazenadas)*130)-60
-    espacamento=20
-
-    # Definir o tamanho da página
-    c.setPageSize((400, len(respostas_armazenadas)*130))
-
-    c.setFont("Helvetica", 20)
-    c.drawString(x, y+10, "Rendimento dos alunos")
-
-    c.setFont("Helvetica", 12)
-
-
-    for i,d in enumerate(respostas_armazenadas):
-        c.drawString(x, y-espacamento, f"O aluno {i+1} teve os seguintes resultados:")
-        c.drawString(x, y-espacamento*2, f'Respostas: {d[0]}')
-        c.drawString(x, y-espacamento*3, f'Acertos: {d[1]}')
-        c.drawString(x, y-espacamento*4, f'Pontuação: {d[2]}')
-
-        y-=espacamento*5
-    # Salvar o PDF
-    c.showPage()
-    c.save()
-
 
 root.mainloop()
 
-gerar_pdf()
+gerar_pdf(respostas_armazenadas)
 print("PDF do rendimento gerado com sucesso.")
