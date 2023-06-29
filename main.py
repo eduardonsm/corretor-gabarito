@@ -48,33 +48,43 @@ def analisar_gabarito(imgTh, respostas=[]):
 
     acertos = 0
     if len(respostas) == len(respostasCorretas):
-        for num, res in enumerate(respostas):
-            if res == respostasCorretas[num]:
-                print(f'{res} OK, correto: {respostasCorretas[num]}')
-                acertos += 1
-            else:
-                print(f'{res} ERRADO, correto: {respostasCorretas[num]}')
+        string_respostas= ''
+        for r in respostas:
+            string_respostas +=r
+        # coloca as respostas em uma frase para fazer a validacao
+        if string_respostas.count('1-') == 1 and string_respostas.count('2-') == 1 and string_respostas.count('3-') == 1 and string_respostas.count('4-') == 1 and string_respostas.count('5-') == 1:
+            # verifica se so existe uma unica alternativa marcada
+            for num, res in enumerate(respostas):
+                if res == respostasCorretas[num]:
+                    print(f'{res} OK, correto: {respostasCorretas[num]}')
+                    acertos += 1
+                else:
+                    print(f'{res} ERRADO, correto: {respostasCorretas[num]}')
 
-        pontuacao = int(acertos * 2)
-        # considerando que sao 5 questoes, cada questao vale 2 para resultar no maximo em 10
+            pontuacao = int(acertos * 2)
+            # considerando que sao 5 questoes, cada questao vale 2 para resultar no maximo em 10
 
-        cv2.waitKey(0)
-        # essa funcao serve para esperar alguma tecla ser digitada
-        print(f'''
-        respostas corretas = {respostasCorretas}
-        respostas = {respostas}
-        acertos = {acertos}
-        pontuacao = {pontuacao}
-        ''')
+            cv2.waitKey(0)
+            # essa funcao serve para esperar alguma tecla ser digitada
+            print(f'''
+            respostas corretas = {respostasCorretas}
+            respostas = {respostas}
+            acertos = {acertos}
+            pontuacao = {pontuacao}
+            ''')
 
-        dados = [respostas, acertos, pontuacao]
-        respostas_armazenadas.append(dados)
-        cv2.destroyAllWindows()
-        # fecha as janelas criadas, por exemplo na opcao de selecionar manualmente
+            dados = [respostas, acertos, pontuacao]
+            respostas_armazenadas.append(dados)
+            cv2.destroyAllWindows()
+            # fecha as janelas criadas, por exemplo na opcao de selecionar manualmente
+        else:
+            messagebox.showerror(
+                "Erro", "Não foi possivel atribuir uma nota! Preencha o gabarito corretamente.")
+            # mensagem de erro caso as respostas forem repetidas ou faltar alguma
     else:
         messagebox.showerror(
             "Erro", "Imagem não reconhecida! Tente selecionar manualmente ou fazer o upload de uma nova imagem.")
-        # mensagem de erro caso as respostas lidas nao forem da mesma quantidade das respostas corretas
+            # mensagem de erro caso as respostas lidas nao forem da mesma quantidade das respostas corretas
 
 def upload_e_processar():
     filename = upar_imagem()
